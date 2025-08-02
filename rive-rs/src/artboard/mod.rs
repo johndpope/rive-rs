@@ -134,6 +134,141 @@ impl<R: Renderer> Artboard<R> {
             ffi::rive_rs_artboard_set_clip(self.inner.raw_artboard, clip);
         }
     }
+
+    /// Get the number of animations in this artboard
+    pub fn animation_count(&self) -> usize {
+        unsafe {
+            ffi::rive_rs_artboard_animation_count(self.inner.raw_artboard)
+        }
+    }
+
+    /// Get an animation by index
+    pub fn animation_at(&self, _index: usize) -> Option<crate::linear_animation::LinearAnimation<R>> {
+        // TODO: Implement actual animation instantiation
+        None
+    }
+
+    /// Get an animation by name
+    pub fn animation_by_name(&self, _name: &str) -> Option<crate::linear_animation::LinearAnimation<R>> {
+        // TODO: Implement actual name-based animation lookup
+        None
+    }
+
+    /// List all animation names in this artboard
+    pub fn animation_names(&self) -> alloc::vec::Vec<alloc::string::String> {
+        let count = self.animation_count();
+        let mut names = alloc::vec::Vec::with_capacity(count);
+        
+        for i in 0..count {
+            let mut data_ptr: *const u8 = core::ptr::null();
+            let mut len: usize = 0;
+            
+            unsafe {
+                ffi::rive_rs_artboard_animation_name_at(
+                    self.inner.raw_artboard,
+                    i,
+                    &mut data_ptr as *mut *const u8,
+                    &mut len as *mut usize,
+                );
+                
+                if !data_ptr.is_null() && len > 0 {
+                    let name_bytes = core::slice::from_raw_parts(data_ptr, len);
+                    if let Ok(name) = alloc::string::String::from_utf8(name_bytes.to_vec()) {
+                        names.push(name);
+                    } else {
+                        names.push(alloc::format!("animation_{}", i));
+                    }
+                } else {
+                    names.push(alloc::format!("animation_{}", i));
+                }
+            }
+        }
+        
+        names
+    }
+
+    /// Get the number of state machines in this artboard
+    pub fn state_machine_count(&self) -> usize {
+        unsafe {
+            ffi::rive_rs_artboard_state_machine_count(self.inner.raw_artboard)
+        }
+    }
+
+    /// Get a state machine by index
+    pub fn state_machine_at(&self, _index: usize) -> Option<crate::state_machine::StateMachine<R>> {
+        // TODO: Implement actual state machine instantiation
+        None
+    }
+
+    /// Get a state machine by name
+    pub fn state_machine_by_name(&self, _name: &str) -> Option<crate::state_machine::StateMachine<R>> {
+        // TODO: Implement actual name-based state machine lookup
+        None
+    }
+
+    /// List all state machine names in this artboard
+    pub fn state_machine_names(&self) -> alloc::vec::Vec<alloc::string::String> {
+        let count = self.state_machine_count();
+        let mut names = alloc::vec::Vec::with_capacity(count);
+        
+        for i in 0..count {
+            let mut data_ptr: *const u8 = core::ptr::null();
+            let mut len: usize = 0;
+            
+            unsafe {
+                ffi::rive_rs_artboard_state_machine_name_at(
+                    self.inner.raw_artboard,
+                    i,
+                    &mut data_ptr as *mut *const u8,
+                    &mut len as *mut usize,
+                );
+                
+                if !data_ptr.is_null() && len > 0 {
+                    let name_bytes = core::slice::from_raw_parts(data_ptr, len);
+                    if let Ok(name) = alloc::string::String::from_utf8(name_bytes.to_vec()) {
+                        names.push(name);
+                    } else {
+                        names.push(alloc::format!("state_machine_{}", i));
+                    }
+                } else {
+                    names.push(alloc::format!("state_machine_{}", i));
+                }
+            }
+        }
+        
+        names
+    }
+
+    /// Get the number of components in this artboard
+    pub fn component_count(&self) -> usize {
+        // TODO: Implement actual component count from C++ runtime
+        0
+    }
+
+    /// Get artboard name
+    pub fn name(&self) -> alloc::string::String {
+        let mut data_ptr: *const u8 = core::ptr::null();
+        let mut len: usize = 0;
+        
+        unsafe {
+            ffi::rive_rs_artboard_get_name(
+                self.inner.raw_artboard,
+                &mut data_ptr as *mut *const u8,
+                &mut len as *mut usize,
+            );
+            
+            if !data_ptr.is_null() && len > 0 {
+                let name_bytes = core::slice::from_raw_parts(data_ptr, len);
+                if let Ok(name) = alloc::string::String::from_utf8(name_bytes.to_vec()) {
+                    name
+                } else {
+                    "default".to_string()
+                }
+            } else {
+                "default".to_string()
+            }
+        }
+    }
 }
 
 impl<R: Renderer> Instantiate for Artboard<R> {

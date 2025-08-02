@@ -640,4 +640,17 @@ extern "C" {
     pub fn rive_rs_artboard_set_origin_y(artboard_instance: *mut Artboard, origin_y: f32);
     pub fn rive_rs_artboard_get_clip(artboard_instance: *const Artboard) -> bool;
     pub fn rive_rs_artboard_set_clip(artboard_instance: *mut Artboard, clip: bool);
+    
+    // File and artboard enumeration functions
+    pub fn rive_rs_file_artboard_count(file: *const File) -> usize;
+    pub fn rive_rs_file_artboard_name_at(file: *const File, index: usize, data: *mut *const u8, len: *mut usize);
+    pub fn rive_rs_artboard_get_name(artboard: *const Artboard, data: *mut *const u8, len: *mut usize);
+    
+    // Animation enumeration functions
+    pub fn rive_rs_artboard_animation_count(artboard: *const Artboard) -> usize;
+    pub fn rive_rs_artboard_animation_name_at(artboard: *const Artboard, index: usize, data: *mut *const u8, len: *mut usize);
+    
+    // State machine enumeration functions  
+    pub fn rive_rs_artboard_state_machine_count(artboard: *const Artboard) -> usize;
+    pub fn rive_rs_artboard_state_machine_name_at(artboard: *const Artboard, index: usize, data: *mut *const u8, len: *mut usize);
 }

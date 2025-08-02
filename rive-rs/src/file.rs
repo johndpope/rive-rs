@@ -186,6 +186,74 @@ impl<R: Renderer> File<R> {
             }
         }
     }
+
+    /// Get the number of artboards in this file
+    pub fn artboard_count(&self) -> usize {
+        unsafe {
+            ffi::rive_rs_file_artboard_count(self.inner.raw_file)
+        }
+    }
+
+    /// Get an artboard by index
+    pub fn artboard_at(&self, index: usize) -> Option<crate::artboard::Artboard<R>> {
+        if index == 0 {
+            // Return default artboard for now
+            use crate::instantiate::{Handle, Instantiate};
+            crate::artboard::Artboard::instantiate(self, Handle::Default)
+        } else {
+            None
+        }
+    }
+
+    /// Get an artboard by name
+    pub fn artboard_by_name(&self, name: &str) -> Option<crate::artboard::Artboard<R>> {
+        // TODO: Implement actual name-based lookup
+        // For now, only support "default" name
+        if name == "default" {
+            use crate::instantiate::{Handle, Instantiate};
+            crate::artboard::Artboard::instantiate(self, Handle::Default)
+        } else {
+            None
+        }
+    }
+
+    /// Get the default artboard (first artboard)
+    pub fn default_artboard(&self) -> Option<crate::artboard::Artboard<R>> {
+        self.artboard_at(0)
+    }
+
+    /// List all artboard names in this file
+    pub fn artboard_names(&self) -> Vec<alloc::string::String> {
+        let count = self.artboard_count();
+        let mut names = Vec::with_capacity(count);
+        
+        for i in 0..count {
+            let mut data_ptr: *const u8 = ptr::null();
+            let mut len: usize = 0;
+            
+            unsafe {
+                ffi::rive_rs_file_artboard_name_at(
+                    self.inner.raw_file,
+                    i,
+                    &mut data_ptr as *mut *const u8,
+                    &mut len as *mut usize,
+                );
+                
+                if !data_ptr.is_null() && len > 0 {
+                    let name_bytes = core::slice::from_raw_parts(data_ptr, len);
+                    if let Ok(name) = alloc::string::String::from_utf8(name_bytes.to_vec()) {
+                        names.push(name);
+                    } else {
+                        names.push(format!("artboard_{}", i));
+                    }
+                } else {
+                    names.push(format!("artboard_{}", i));
+                }
+            }
+        }
+        
+        names
+    }
 }
 
 impl<R: Renderer> fmt::Debug for File<R> {
