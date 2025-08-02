@@ -628,4 +628,16 @@ extern "C" {
     pub fn rive_rs_scene_pointer_move(scene: *mut Scene, x: f32, y: f32);
     pub fn rive_rs_scene_pointer_up(scene: *mut Scene, x: f32, y: f32);
     pub fn rive_rs_file_export(file: *const File, data: *mut *mut u8, len: *mut usize);
+    
+    // Artboard property modification functions
+    pub fn rive_rs_artboard_get_width(artboard_instance: *const Artboard) -> f32;
+    pub fn rive_rs_artboard_set_width(artboard_instance: *mut Artboard, width: f32);
+    pub fn rive_rs_artboard_get_height(artboard_instance: *const Artboard) -> f32;
+    pub fn rive_rs_artboard_set_height(artboard_instance: *mut Artboard, height: f32);
+    pub fn rive_rs_artboard_get_origin_x(artboard_instance: *const Artboard) -> f32;
+    pub fn rive_rs_artboard_set_origin_x(artboard_instance: *mut Artboard, origin_x: f32);
+    pub fn rive_rs_artboard_get_origin_y(artboard_instance: *const Artboard) -> f32;
+    pub fn rive_rs_artboard_set_origin_y(artboard_instance: *mut Artboard, origin_y: f32);
+    pub fn rive_rs_artboard_get_clip(artboard_instance: *const Artboard) -> bool;
+    pub fn rive_rs_artboard_set_clip(artboard_instance: *mut Artboard, clip: bool);
 }

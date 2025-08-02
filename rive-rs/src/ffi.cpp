@@ -971,4 +971,55 @@ extern "C"
         *data = nullptr;
         *len = 0;
     }
+
+    // Artboard property modification functions
+    float rive_rs_artboard_get_width(const ArtboardInstance* artboard_instance)
+    {
+        return artboard_instance->width();
+    }
+
+    void rive_rs_artboard_set_width(ArtboardInstance* artboard_instance, float width)
+    {
+        artboard_instance->width(width);
+    }
+
+    float rive_rs_artboard_get_height(const ArtboardInstance* artboard_instance)
+    {
+        return artboard_instance->height();
+    }
+
+    void rive_rs_artboard_set_height(ArtboardInstance* artboard_instance, float height)
+    {
+        artboard_instance->height(height);
+    }
+
+    float rive_rs_artboard_get_origin_x(const ArtboardInstance* artboard_instance)
+    {
+        return artboard_instance->originX();
+    }
+
+    void rive_rs_artboard_set_origin_x(ArtboardInstance* artboard_instance, float origin_x)
+    {
+        artboard_instance->originX(origin_x);
+    }
+
+    float rive_rs_artboard_get_origin_y(const ArtboardInstance* artboard_instance)
+    {
+        return artboard_instance->originY();
+    }
+
+    void rive_rs_artboard_set_origin_y(ArtboardInstance* artboard_instance, float origin_y)
+    {
+        artboard_instance->originY(origin_y);
+    }
+
+    bool rive_rs_artboard_get_clip(const ArtboardInstance* artboard_instance)
+    {
+        return artboard_instance->clip();
+    }
+
+    void rive_rs_artboard_set_clip(ArtboardInstance* artboard_instance, bool clip)
+    {
+        artboard_instance->clip(clip);
+    }
 }

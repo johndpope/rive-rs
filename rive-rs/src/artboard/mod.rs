@@ -50,6 +50,90 @@ impl<R: Renderer> Artboard<R> {
     pub fn components(&mut self) -> Components {
         Components::new(components::RawArtboard(self.inner.raw_artboard))
     }
+
+    // Artboard property getters and setters
+    
+    /// Gets the width of the artboard
+    pub fn width(&self) -> f32 {
+        unsafe {
+            ffi::rive_rs_artboard_get_width(self.inner.raw_artboard)
+        }
+    }
+
+    /// Sets the width of the artboard
+    pub fn set_width(&mut self, width: f32) {
+        unsafe {
+            ffi::rive_rs_artboard_set_width(self.inner.raw_artboard, width);
+        }
+    }
+
+    /// Gets the height of the artboard
+    pub fn height(&self) -> f32 {
+        unsafe {
+            ffi::rive_rs_artboard_get_height(self.inner.raw_artboard)
+        }
+    }
+
+    /// Sets the height of the artboard
+    pub fn set_height(&mut self, height: f32) {
+        unsafe {
+            ffi::rive_rs_artboard_set_height(self.inner.raw_artboard, height);
+        }
+    }
+
+    /// Sets both width and height of the artboard
+    pub fn set_dimensions(&mut self, width: f32, height: f32) {
+        self.set_width(width);
+        self.set_height(height);
+    }
+
+    /// Gets the origin X coordinate of the artboard
+    pub fn origin_x(&self) -> f32 {
+        unsafe {
+            ffi::rive_rs_artboard_get_origin_x(self.inner.raw_artboard)
+        }
+    }
+
+    /// Sets the origin X coordinate of the artboard
+    pub fn set_origin_x(&mut self, origin_x: f32) {
+        unsafe {
+            ffi::rive_rs_artboard_set_origin_x(self.inner.raw_artboard, origin_x);
+        }
+    }
+
+    /// Gets the origin Y coordinate of the artboard
+    pub fn origin_y(&self) -> f32 {
+        unsafe {
+            ffi::rive_rs_artboard_get_origin_y(self.inner.raw_artboard)
+        }
+    }
+
+    /// Sets the origin Y coordinate of the artboard
+    pub fn set_origin_y(&mut self, origin_y: f32) {
+        unsafe {
+            ffi::rive_rs_artboard_set_origin_y(self.inner.raw_artboard, origin_y);
+        }
+    }
+
+    /// Sets both origin X and Y coordinates of the artboard
+    pub fn set_origin(&mut self, origin_x: f32, origin_y: f32) {
+        self.set_origin_x(origin_x);
+        self.set_origin_y(origin_y);
+    }
+
+    /// Gets whether the artboard clips its contents
+    pub fn clip(&self) -> bool {
+        unsafe {
+            ffi::rive_rs_artboard_get_clip(self.inner.raw_artboard)
+        }
+    }
+
+    /// Sets whether the artboard clips its contents
+    pub fn set_clip(&mut self, clip: bool) {
+        unsafe {
+            ffi::rive_rs_artboard_set_clip(self.inner.raw_artboard, clip);
+        }
+    }
 }
 
 impl<R: Renderer> Instantiate for Artboard<R> {
