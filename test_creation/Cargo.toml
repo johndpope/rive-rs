@@ -1,0 +1,7 @@
+[package]
+name = "test_creation"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rive-rs = { path = "../rive-rs", default-features = false }

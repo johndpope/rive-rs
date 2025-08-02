@@ -5,6 +5,7 @@
 #include "rive/animation/state_machine_instance.hpp"
 #include "rive/animation/state_machine_number.hpp"
 #include "rive/animation/state_machine_trigger.hpp"
+#include "rive/backboard.hpp"
 #include "rive/custom_property_boolean.hpp"
 #include "rive/custom_property_number.hpp"
 #include "rive/custom_property_string.hpp"
@@ -463,6 +464,23 @@ extern "C"
         RustFactory* rust_factory = new RustFactory(entries);
         auto file = rive::File::import({data, len}, rust_factory, result);
 
+        *factory = rust_factory;
+
+        return static_cast<const File*>(file.release());
+    }
+
+    const File* rive_rs_file_create(const RendererEntries* entries,
+                                    RustFactory** factory)
+    {
+        RustFactory* rust_factory = new RustFactory(entries);
+        auto file = std::unique_ptr<File>(new rive::File(rust_factory, nullptr));
+        
+        // Create a minimal backboard for the empty file
+        auto backboard = new Backboard();
+        // Note: This is a minimal implementation. In a full implementation,
+        // we would need to properly initialize the backboard and possibly
+        // add a default artboard. For now, this creates an empty but valid file structure.
+        
         *factory = rust_factory;
 
         return static_cast<const File*>(file.release());
@@ -939,5 +957,18 @@ extern "C"
         std::copy(inverse_view_transform_mat.values(),
                   inverse_view_transform_mat.values() + 6,
                   inverse_view_transform);
+    }
+
+    void rive_rs_file_export(const File* file, 
+                            uint8_t** data, 
+                            size_t* len)
+    {
+        // Note: This is a placeholder implementation for file export.
+        // The Rive C++ runtime doesn't currently expose a binary export API.
+        // This would need to be implemented by serializing the file contents
+        // back to the Rive binary format. For now, we return null to indicate
+        // that export is not yet supported.
+        *data = nullptr;
+        *len = 0;
     }
 }

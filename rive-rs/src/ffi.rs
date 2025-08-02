@@ -490,6 +490,11 @@ extern "C" {
         result: *mut FileResult,
         factory: *mut *mut Factory,
     ) -> *const File;
+    #[allow(improper_ctypes)]
+    pub fn rive_rs_file_create(
+        entries: *const (),
+        factory: *mut *mut Factory,
+    ) -> *const File;
     pub fn rive_rs_file_release(file: *const File, factory: *mut Factory);
     pub fn rive_rs_instantiate_artboard(
         file: *const File,
@@ -622,4 +627,5 @@ extern "C" {
     pub fn rive_rs_scene_pointer_down(scene: *mut Scene, x: f32, y: f32);
     pub fn rive_rs_scene_pointer_move(scene: *mut Scene, x: f32, y: f32);
     pub fn rive_rs_scene_pointer_up(scene: *mut Scene, x: f32, y: f32);
+    pub fn rive_rs_file_export(file: *const File, data: *mut *mut u8, len: *mut usize);
 }

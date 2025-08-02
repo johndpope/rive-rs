@@ -1,4 +1,4 @@
-use alloc::sync::Arc;
+use alloc::{sync::Arc, vec::Vec};
 use core::{fmt, marker::PhantomData, ptr};
 
 use crate::{
@@ -77,8 +77,66 @@ impl<R: Renderer> File<R> {
         }
     }
 
+    #[inline]
+    pub fn create() -> Self {
+        let mut raw_factory = ptr::null_mut();
+
+        let raw_file = unsafe {
+            ffi::rive_rs_file_create(
+                ffi::RendererEntries::<R>::ENTRIES as *const ffi::RendererEntries<R> as *const (),
+                &mut raw_factory as *mut *mut ffi::Factory,
+            )
+        };
+
+        Self {
+            inner: Arc::new(FileInner {
+                raw_file,
+                raw_factory,
+            }),
+            _phantom: PhantomData,
+        }
+    }
+
     pub(crate) fn as_inner(&self) -> &Arc<FileInner> {
         &self.inner
+    }
+
+    /// Exports the file to binary data.
+    /// Returns None if export is not supported or fails.
+    pub fn export(&self) -> Option<Vec<u8>> {
+        let mut data_ptr: *mut u8 = ptr::null_mut();
+        let mut len: usize = 0;
+        
+        unsafe {
+            ffi::rive_rs_file_export(
+                self.inner.raw_file,
+                &mut data_ptr as *mut *mut u8,
+                &mut len as *mut usize,
+            );
+        }
+        
+        if data_ptr.is_null() || len == 0 {
+            None
+        } else {
+            unsafe {
+                let data = Vec::from_raw_parts(data_ptr, len, len);
+                Some(data)
+            }
+        }
+    }
+
+    /// Saves the file to the specified path.
+    /// Returns an error if the export fails or file cannot be written.
+    #[cfg(feature = "vello")]
+    pub fn save_to_file<P: AsRef<std::path::Path>>(&self, path: P) -> Result<(), Box<dyn std::error::Error>> {
+        use std::fs;
+        
+        if let Some(data) = self.export() {
+            fs::write(path, data)?;
+            Ok(())
+        } else {
+            Err("Export not supported".into())
+        }
     }
 }
 
