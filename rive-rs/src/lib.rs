@@ -42,6 +42,8 @@ for r in 1..=5 {
 extern crate alloc;
 
 mod artboard;
+#[cfg(feature = "export")]
+pub mod export;
 mod ffi;
 mod file;
 mod instantiate;

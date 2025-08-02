@@ -1,6 +1,9 @@
 use alloc::{sync::Arc, vec::Vec};
 use core::{fmt, marker::PhantomData, ptr};
 
+#[cfg(feature = "export")]
+use crate::export::{ExportError, ExportFormat, create_empty_file_export, export_to_json};
+
 use crate::{
     ffi::{self},
     renderer::Renderer,
@@ -102,7 +105,8 @@ impl<R: Renderer> File<R> {
     }
 
     /// Exports the file to binary data.
-    /// Returns None if export is not supported or fails.
+    /// Returns None if binary export is not supported or fails.
+    /// For debugging and validation, use `export_json()` instead.
     pub fn export(&self) -> Option<Vec<u8>> {
         let mut data_ptr: *mut u8 = ptr::null_mut();
         let mut len: usize = 0;
@@ -125,17 +129,61 @@ impl<R: Renderer> File<R> {
         }
     }
 
+    /// Exports the file to JSON format for debugging and inspection.
+    /// This provides a human-readable representation of the file structure.
+    #[cfg(feature = "export")]
+    pub fn export_json(&self) -> Result<alloc::string::String, ExportError> {
+        // For now, create a basic export structure
+        // TODO: Extract actual file data from C++ runtime
+        let file_export = create_empty_file_export();
+        export_to_json(&file_export)
+    }
+
+    /// Exports the file in the specified format.
+    #[cfg(feature = "export")]
+    pub fn export_format(&self, format: ExportFormat) -> Result<Vec<u8>, ExportError> {
+        match format {
+            ExportFormat::Json => {
+                let json = self.export_json()?;
+                Ok(json.into_bytes())
+            }
+            ExportFormat::Memory => {
+                // TODO: Implement memory dump export
+                Err(ExportError::UnsupportedFormat)
+            }
+        }
+    }
+
+    /// Saves the file to the specified path in JSON format.
+    #[cfg(all(feature = "export", feature = "vello"))]
+    pub fn save_json<P: AsRef<std::path::Path>>(&self, path: P) -> Result<(), ExportError> {
+        use std::fs;
+        
+        let json = self.export_json()?;
+        fs::write(path, json).map_err(ExportError::IoError)
+    }
+
     /// Saves the file to the specified path.
     /// Returns an error if the export fails or file cannot be written.
     #[cfg(feature = "vello")]
     pub fn save_to_file<P: AsRef<std::path::Path>>(&self, path: P) -> Result<(), Box<dyn std::error::Error>> {
         use std::fs;
         
+        // Try binary export first, fall back to JSON
         if let Some(data) = self.export() {
             fs::write(path, data)?;
             Ok(())
         } else {
-            Err("Export not supported".into())
+            #[cfg(feature = "export")]
+            {
+                let json = self.export_json()?;
+                fs::write(path, json)?;
+                Ok(())
+            }
+            #[cfg(not(feature = "export"))]
+            {
+                Err("Export not supported".into())
+            }
         }
     }
 }

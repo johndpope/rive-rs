@@ -94,11 +94,34 @@ impl rive_rs::renderer::Renderer for MockRenderer {
 }
 
 fn main() {
-    println!("Testing file creation...");
+    println!("Testing file creation and export...");
     
     // Create an empty file
-    let _file: File<MockRenderer> = File::create();
+    let file: File<MockRenderer> = File::create();
     println!("✓ File created successfully");
     
-    println!("File creation test completed!");
+    // Test JSON export
+    match file.export_json() {
+        Ok(json) => {
+            println!("✓ JSON export successful");
+            println!("  Export preview: {}", 
+                if json.len() > 100 { 
+                    format!("{}...", &json[..100]) 
+                } else { 
+                    json 
+                }
+            );
+        }
+        Err(e) => {
+            println!("✗ JSON export failed: {}", e);
+        }
+    }
+    
+    // Test binary export (expected to return None)
+    match file.export() {
+        Some(data) => println!("✓ Binary export successful: {} bytes", data.len()),
+        None => println!("✓ Binary export not yet supported (expected)"),
+    }
+    
+    println!("File creation and export test completed!");
 }
